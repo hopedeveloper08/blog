@@ -13,7 +13,7 @@ class UserTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
     def test_register(self):
-        url = reverse('register')
+        url = reverse('users')
         data = {'username': 'new_user', 'password': 'new_pass'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -29,20 +29,20 @@ class UserTests(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_get_profiles(self):
-        url = reverse('profiles')
+    def test_get_users(self):
+        url = reverse('users')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
 
-    def test_get_profile(self):
-        url = reverse('profile', kwargs={'pk': self.user.id})
+    def test_get_user(self):
+        url = reverse('user', kwargs={'pk': self.user.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], self.user.username)
 
-    def test_update_profile(self):
-        url = reverse('profile', kwargs={'pk': self.user.id})
+    def test_update_user(self):
+        url = reverse('user', kwargs={'pk': self.user.id})
         data = {'username': 'updated_user'}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -51,7 +51,7 @@ class UserTests(APITestCase):
 
     def test_unauthorized_profile_update(self):
         other_user = User.objects.create_user(username='other_user', password='other_pass')
-        url = reverse('profile', args=[other_user.id])
+        url = reverse('user', args=[other_user.id])
         data = {'username': 'hacker'}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
